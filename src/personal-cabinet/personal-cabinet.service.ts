@@ -20,7 +20,12 @@ export class PersonalCabinetService {
             .catch((err)=>{
                 throw new UnauthorizedException("Пользователь не существует");
             })
-        user.avatar = await this.firebaseService.getPhotoUrl(String(user.id),user.avatar,'user')
+        if(user.avatar){
+            user.avatar = await this.firebaseService.getPhotoUrl(String(user.id),user.avatar,'user')
+        }
+        else{
+            user.avatar = '';
+        }
         return user;
     }
 

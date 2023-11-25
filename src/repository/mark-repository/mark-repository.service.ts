@@ -26,7 +26,12 @@ export class MarkRepositoryService {
 
     async updateMark(mark:MarkModel){
         await this.markRepository.update({
-            pictures:mark.pictures
+            topic: mark.topic,
+            description: mark.description,
+            latitude: mark.latitude,
+            longitude: mark.longitude,
+            category: mark.category,
+            pictures:mark.pictures,
         },
             {
                 where:{
@@ -36,8 +41,25 @@ export class MarkRepositoryService {
         ).catch((err)=>{throw err})
     }
 
+    async confirmMark(id){
+        await this.markRepository.update({
+            isChecked:true,
+            publicationDate:new Date()
+        },
+            {
+                where:{
+                    id: id,
+                }
+            }
+        ).catch((err)=>{throw err})
+    }
+
     async getNotAcceptedMarks(){
-        return await this.markRepository.findAll()
+        return await this.markRepository.findAll({
+            where:{
+                isChecked:false
+            }
+        })
             .catch(err=>{
                 console.log(err);
                 throw err;
@@ -54,7 +76,8 @@ export class MarkRepositoryService {
                 },
                 longitude:{
                     [Op.between]:[longitude -2, Number(longitude) + 2]
-                }
+                },
+                isChecked:true
             }
         })
         .catch(err=>{
@@ -70,6 +93,23 @@ export class MarkRepositoryService {
                 id:id
             }
         }).catch(err=>{
+            throw err;
+        })
+    }
+    
+    async getMarkById(id:number){
+        return await this.markRepository.findOne({
+            where:{
+                id:id
+            }
+        }).catch(err=>{
+            throw err;
+        })
+    }
+
+    async getAllMarks(){
+        return await this.markRepository.findAll()
+        .catch(err=>{
             throw err;
         })
     }

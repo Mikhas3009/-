@@ -10,8 +10,9 @@ export class JWTService {
     ){}
     
     async generateAccessToken(data:UserModel){
-        const {name,email,phone,phoneToken,address,region,role} = data
+        const {name,email,phone,phoneToken,address,region,role,id} = data
         const tokenData = {
+            id:id,
             fio:name,
             email:email,
             phone:phone,

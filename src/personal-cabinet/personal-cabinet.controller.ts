@@ -12,9 +12,10 @@ export class PersonalCabinetController {
         private personalCabinetService:PersonalCabinetService
     ){}
 
-    @Get('/personal-cabinet')
+    @Get('/personalData')
     async getPersonalCabinet(@Cookie('accessToken')token){
         try{
+            console.log(token)
             return await this.personalCabinetService.getPersonalData(token)
         }
         catch(err){

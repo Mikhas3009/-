@@ -8,6 +8,8 @@ import { MyJwtModule } from './jwt/jwt.module';
 import { MarkRepositoryModule } from './repository/mark-repository/mark-repository.module';
 import { MapModule } from './map/map.module';
 import { PersonalCabinetModule } from './personal-cabinet/personal-cabinet.module';
+import { CitizensRequestModule } from './citizens-request/citizens-request.module';
+import { CitizensRequestRepositoryModule } from './repository/citizens-request-repository/citizens-request-repository.module';
 
 @Module({
     imports: [
@@ -20,6 +22,8 @@ import { PersonalCabinetModule } from './personal-cabinet/personal-cabinet.modul
         MarkRepositoryModule,
         MapModule,
         PersonalCabinetModule,
+        CitizensRequestModule,
+        CitizensRequestRepositoryModule,
     ],
     controllers: [],
     providers: [],

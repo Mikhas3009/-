@@ -9,6 +9,9 @@ import { EmailService } from 'src/email/email.service';
 import { UserRepositoryService } from 'src/repository/user-repository/user-repository.service';
 import {  PhoneNumberUtil } from 'google-libphonenumber';
 import { JWTService } from 'src/jwt/jwt.service';
+import { UserRoles } from 'src/roles-guards/roles';
+import * as nanoid from 'nanoid';
+var randomize = require('randomatic');
 
 @Injectable()
 export class AuthService {
@@ -23,19 +26,17 @@ export class AuthService {
     async authUser(body:UserDto){
         const {phone,password} = body;
         const user = await this.userRepository.findByNumber(phone)
-        if (!user){
-            throw new UnauthorizedException('Пользователь не найден')
-        }
-        if(password != user.password){
-            throw new UnauthorizedException('Неверный пароль');
+        if (!user||password != user.password){
+            throw new UnauthorizedException('Неверные данные')
         }
         return this.jwtService.generateAccessToken(user);
     } 
 
-    async resetPassword(email?:string){ 
+    async restorePassword(phone?:string){ 
         const code = uuid.v4().slice(0,6);
-        console.log(email)
-        const user = await this.userRepository.setEmailCode(email,code)
+        // console.log(number)
+        // const {email} = await this.userRepository.findByNumber(number);
+        const user = await this.userRepository.setEmailCode(phone,code)
             .catch(err=>console.log(err));
         if(!user){
             throw new UnauthorizedException('Аккаунта не существует')
@@ -69,18 +70,36 @@ export class AuthService {
         else return true;
     }
 
+    async checkEmail(body){
+        const {email} = body;
+        //PhoneNumberUtil.getInstance()
+        const user = await this.userRepository.findByEmail(email)
+            .catch(err=>{
+                console.log(err);
+            });
+        if(user){
+            return false;
+        }
+        else return true;
+    }
+
     async vefifyNumber(req,token:string){
-        const code = uuid.v4().slice(0,6);
-        await this.firebaseService.sendNotification(token, code);
-        return {code:code};
+        console.log(token)
+        const numericCode = String(Math.floor(Math.random() * (9999 - 1000 + 1) + 1000));
+        await this.firebaseService.sendNotification(token, numericCode)
+            .catch((err)=>{
+                console.log(err);
+                throw err;
+            });
+        return {code:numericCode};
     }
 
     async getImage(){
         return await this.firebaseService.getPhotoUrl();
     }
     
-    async registration(body){
-        body.role = 'user';
+    async registration(body,role = UserRoles.User){
+        body.role = role;
         const user = await this.userRepository.createUser(body)
             .catch(err=>{
                 throw new HttpException("Критическая ошибка сервера",HttpStatus.BAD_GATEWAY)

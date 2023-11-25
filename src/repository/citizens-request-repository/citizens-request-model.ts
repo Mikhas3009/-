@@ -1,10 +1,11 @@
 
-import { Model ,Table,Column,DataType, ForeignKey, HasMany} from "sequelize-typescript";
+import { Model ,Table,Column,DataType, ForeignKey, HasMany, HasOne, BelongsTo} from "sequelize-typescript";
+import { UserModel } from "../user-repository/user-model";
 
 
 
-@Table({tableName: "marks", createdAt: false, updatedAt: false })
-export class MarkModel extends Model<MarkModel> {
+@Table({tableName: "citizens-request", createdAt: false, updatedAt: false })
+export class SitizensReqModel extends Model<SitizensReqModel> {
 
     @Column({type: DataType.INTEGER, primaryKey: true, autoIncrement: true,unique: true})
     id:number;
@@ -29,9 +30,20 @@ export class MarkModel extends Model<MarkModel> {
 
     @Column({type: DataType.BOOLEAN,unique: false,allowNull: true})
     isChecked:boolean;
-
     
     @Column({type: DataType.DATE,unique: false,allowNull: true})
     publicationDate:Date;
+
+    @Column({type: DataType.STRING,unique: false,allowNull: true})
+    response:string;
+
+    @Column({type:DataType.STRING,unique: false,allowNull: true})
+    serviceId:string;
+
+    @ForeignKey(()=>UserModel)
+    @Column({type: DataType.INTEGER})
+    userId:number;
+    @BelongsTo(() => UserModel)
+    user: UserModel;
 
 }

@@ -24,7 +24,7 @@ export class RolesGuard implements CanActivate {
         try {
             const decodedToken = await this.jwtService.veifyToken(accessToken);
             const userRole = decodedToken.role;
-            return roles == userRole;
+            return  roles.includes(userRole);
         }
         catch (error) {
             // Если токен недействителен, блокируем доступ

@@ -24,7 +24,6 @@ export class MapService {
         })
         path = path.slice(0,path.length-1)
         mark.pictures = path;
-
         const [res1 ,res2 ] = await Promise.all([
             this.firebaseService.uploadFilesToUserFolder(String(mark.id),files),
             this.markReqpositoryService.updateMark(mark)
@@ -36,15 +35,63 @@ export class MapService {
         }
     }
 
+    async updateMark(body:MarkModel,files){
+        let path = '';
+        files.forEach((file)=>{
+            path = path+file.originalname+" "
+        })
+        path = path.slice(0,path.length-1)
+        body.pictures = path;
+        const [res1 ,res2 ] = await Promise.all([
+            this.firebaseService.uploadFilesToUserFolder(String(body.id),files),
+            this.markReqpositoryService.updateMark(body)
+        ]).catch((err)=>{
+            throw err;
+        })
+    }
+
     async addMarks(body){
         await this.markReqpositoryService.createManyMarks(body);
+    }
+
+    async getMarkById(id:number){
+        const mark = await this.markReqpositoryService.getMarkById(id)
+            .catch((err)=>{
+                console.log(err);
+                throw err;
+            });
+        const pictures = mark.pictures.split(' ');
+        mark.pictures = '';
+        await Promise.all(pictures.map(async (picture) => {
+            const url = await this.firebaseService.getPhotoUrl(String(mark.id), picture);
+            mark.pictures = mark.pictures + url+" ";
+        }));
+        return mark;
+        
     }
 
     async getUnConfirmedMarks(){
         return await this.markReqpositoryService.getNotAcceptedMarks();
     }
 
-    async getMarks(coordinates){
+    async confirmMark(mark){
+        const{id}=mark
+        await this.markReqpositoryService.confirmMark(id)
+            .catch((err)=>{
+                console.log(err);
+                throw err;
+            });
+    }
+
+    async getAllMarks(){
+        const marks = await this.markReqpositoryService.getAllMarks()
+        .catch((err)=>{
+            console.log(err)
+            throw new HttpException('Не удалось получить список новостей',HttpStatus.BAD_GATEWAY);
+        })
+    }
+
+    async getClosestMarks(coordinates){
         const { longitude,latitude} = coordinates;
         let marks = await this.markReqpositoryService.getClosestMarks(latitude,longitude)
             .catch(err=>{

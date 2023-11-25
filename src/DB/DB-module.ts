@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from "@nestjs/sequelize";
 import * as path from 'path';
+import { SitizensReqModel } from 'src/repository/citizens-request-repository/citizens-request-model';
 import { MarkModel } from 'src/repository/mark-repository/mark-model';
 import { UserModel } from 'src/repository/user-repository/user-model';
 
@@ -24,7 +25,8 @@ import { UserModel } from 'src/repository/user-repository/user-model';
             autoLoadModels: true,
             models:[
                 UserModel,
-                MarkModel
+                MarkModel,
+                SitizensReqModel
             ],
         }),
     ],

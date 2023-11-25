@@ -39,14 +39,14 @@ export class UserRepositoryService {
         });
     }
 
-    async setEmailCode(email: string, code: string) {
+    async setEmailCode(phone: string, code: string) {
         const [rows, user] = await this.userRepository.update(
             {
                 emailCode: code
             },
             {
                 where: {
-                    email: email
+                    phone: phone
                 },
                 returning: true,
             }

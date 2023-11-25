@@ -37,19 +37,15 @@ export class FirebaseService {
                 body: message,
             },
         };
-        const response = await messaging.sendToDevice(to, payload)
+        const response = await messaging.sendToDevice(to, payload).catch((err)=>{
+            throw err;
+        })
         return response
     }
 
-    async getPhotoUrl(id?: string, fileName?: string,user = ''): Promise<string> {
-        const fileRef =  this.firebaseAdmin.storage().bucket().file(`${id}/${fileName}`);
-        // const files = await this.firebaseAdmin.storage().bucket().getFiles({
-        //     prefix: ''
-        // // });
-        // const res = files;
-        // console.log(files);
-        // console.log(res[0][0].getSignedUrl) несколько файлов
-        // Получаем публичный URL для файла
+    async getPhotoUrl(id='', fileName='',folderName = ''): Promise<string> {
+        const fileRef =  this.firebaseAdmin.storage().bucket().file(`${folderName}${id}/${fileName}`);
+
 
         const [url] = await fileRef.getSignedUrl({
             action: 'read',
@@ -58,13 +54,13 @@ export class FirebaseService {
         return url;
     }
 
-    async uploadFilesToUserFolder(markId: string, files: Express.Multer.File[],user=''): Promise<string[]> {
+    async uploadFilesToUserFolder(markId: string, files: Express.Multer.File[],folderName=''): Promise<string[]> {
 
         const bucket = admin.storage().bucket(); // создаем путь к папке пользователя
         files.map(async (file) => {
           // Загрузка файла в папку пользователя
             const pathFile = join(__dirname,file.originalname)
-            await bucket.file(`${user}${markId}/${file.originalname}`).save(Buffer.from(file.buffer))
+            await bucket.file(`${folderName}${markId}/${file.originalname}`).save(Buffer.from(file.buffer))
         });
       
         return;
