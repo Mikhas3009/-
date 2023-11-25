@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, UploadedFiles, UseGuards, UseInterceptors } from '@nestjs/common';
 import { Cookie } from 'src/auth/decorators/cookie-parser';
 import { CitizensRequestService } from './citizens-request.service';
 import { GlobalResponse } from 'src/globals/global-response-type';
@@ -38,7 +38,7 @@ export class CitizensRequestController {
 
     @UseGuards(RolesGuard)
     @Roles(UserRoles.Admin)
-    @Get('/unConfirmedRequests')
+    @Put('/confirmedRequest')
     async getUnConfirmedMarks(@Body()req){
         try{
             return await this.citizensReqService.confirmRequest(req);

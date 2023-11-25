@@ -15,7 +15,6 @@ export class PersonalCabinetService {
 
     async getPersonalData(token: string){
         const{email} = await this.jwtService.decodeToken(token);
-        console.log(email);
         const user = await this.userRepository.findByEmail(email)
             .catch((err)=>{
                 throw new UnauthorizedException("Пользователь не существует");

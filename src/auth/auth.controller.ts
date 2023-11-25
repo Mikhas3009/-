@@ -20,12 +20,10 @@ export class AuthController {
     async isLoggedIn(@Cookie('accessToken') token) {
         try {
             await this.authService.isLoggedIn(token);
-            return {
-                message: 'isLoggined'
-            }
+            return true;
         }
         catch (err) {
-            return err;
+            return false
         }
     }
 
@@ -52,13 +50,14 @@ export class AuthController {
 
     @Post('/auth')
     async authUser(@Body() user: UserDto, @Res() res: Response) {
-        console.log(user)
         try {
+            console.log(user)
             const token = await this.authService.authUser(user);
             res.cookie('accessToken', token, { maxAge: 1000 * 60 * 60 * 24, secure: true, sameSite: 'none' });
             res.send( new GlobalResponse(200,true,"Авторизациия прошла успешно").response)
         }
         catch (err) {
+            console.log(err)
             res.send(new GlobalResponse(401,false,err.message).response);
         }
     }

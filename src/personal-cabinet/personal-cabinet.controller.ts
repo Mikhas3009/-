@@ -19,6 +19,7 @@ export class PersonalCabinetController {
             return await this.personalCabinetService.getPersonalData(token)
         }
         catch(err){
+            console.log(err);
             return err;
         }
     }

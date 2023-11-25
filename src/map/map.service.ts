@@ -84,11 +84,17 @@ export class MapService {
     }
 
     async getAllMarks(){
-        const marks = await this.markReqpositoryService.getAllMarks()
-        .catch((err)=>{
-            console.log(err)
-            throw new HttpException('Не удалось получить список новостей',HttpStatus.BAD_GATEWAY);
-        })
+        const marks = await this.markReqpositoryService.getAllMarks();
+        await Promise.all(marks.map(async (mark) => {
+            const pictures = mark.pictures.split(' ');
+            mark.pictures = '';
+    
+            await Promise.all(pictures.map(async (picture) => {
+                const url = await this.firebaseService.getPhotoUrl(String(mark.id), picture);
+                mark.pictures = mark.pictures + url+" ";
+            }));
+        }));
+        return marks;
     }
 
     async getClosestMarks(coordinates){

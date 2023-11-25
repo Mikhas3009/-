@@ -30,7 +30,7 @@ export class CitizensRequestService {
         path = path.slice(0,path.length-1)
         request.pictures = path;
         const [res1 ,res2 ] = await Promise.all([
-            this.firebaseService.uploadFilesToUserFolder(String(request.id),files),
+            this.firebaseService.uploadFilesToUserFolder(String(request.id),files,'request'),
             this.sitizensReqRep.updateRequest(request)
         ]).catch((err)=>{
                 throw err;
@@ -39,20 +39,34 @@ export class CitizensRequestService {
 
     async getMyRequest(token:string){
         const {id,role} = await this.jwtService.decodeToken(token);
+        let requests:SitizensReqModel[] = [];
+        console.log(role==UserRoles.User,id)
         if(role == UserRoles.User ){
-            return await this.sitizensReqRep.getReqByUserId(id)
+            requests = await this.sitizensReqRep.getReqByUserId(id)
                 .catch((err)=>{
                     console.log(err);
                     throw new HttpException('Не получить ваши обращения',HttpStatus.BAD_GATEWAY);
                 });
         }
         if(role == UserRoles.Service){
-            return await this.sitizensReqRep.getReqByServiceId(id)
+            requests = await this.sitizensReqRep.getReqByServiceId(id)
             .catch((err)=>{
                 console.log(err);
                 throw new HttpException('Не получить ваши обращения',HttpStatus.BAD_GATEWAY);
-            });;
+            }); 
         }
+        await Promise.all(requests.map(async (req) => {
+            const pictures = req.pictures.split(' ');
+            req.pictures = '';
+    
+            await Promise.all(pictures.map(async (picture) => {
+                const url = await this.firebaseService.getPhotoUrl(String(req.id), picture,'service');
+                req.pictures = req.pictures + url+" ";
+            }));
+        }));
+
+        return requests;
+
     }
 
     async confirmRequest(req){

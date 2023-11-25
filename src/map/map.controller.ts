@@ -63,7 +63,7 @@ export class MapController {
             return await this.mapService.getMarkById(id)
         }
         catch(err){
-
+            return err;
         }
     }
 

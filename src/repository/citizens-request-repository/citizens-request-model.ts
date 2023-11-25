@@ -37,7 +37,7 @@ export class SitizensReqModel extends Model<SitizensReqModel> {
     @Column({type: DataType.STRING,unique: false,allowNull: true})
     response:string;
 
-    @Column({type:DataType.STRING,unique: false,allowNull: true})
+    @Column({type:DataType.STRING,unique: false,allowNull: false})
     serviceId:string;
 
     @ForeignKey(()=>UserModel)
