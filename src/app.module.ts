@@ -6,6 +6,8 @@ import { UserRepositoryModule } from './repository/user-repository/user-reposito
 import { EmailModule } from './email/email.module';
 import { MyJwtModule } from './jwt/jwt.module';
 import { MarkRepositoryModule } from './repository/mark-repository/mark-repository.module';
+import { MapModule } from './map/map.module';
+import { PersonalCabinetModule } from './personal-cabinet/personal-cabinet.module';
 
 @Module({
     imports: [
@@ -16,6 +18,8 @@ import { MarkRepositoryModule } from './repository/mark-repository/mark-reposito
         EmailModule,
         MyJwtModule,
         MarkRepositoryModule,
+        MapModule,
+        PersonalCabinetModule,
     ],
     controllers: [],
     providers: [],

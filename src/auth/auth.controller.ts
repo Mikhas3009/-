@@ -15,7 +15,7 @@ export class AuthController {
     @Get('/isLoggedIn')
     async isLoggedIn(@Cookie('accessToken')token){
         try{
-            await this.authService.isLoggedIn(token||'eyJhbciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmaW8iOiJsYWxhbGFsYSIsImVtYWlsIjoibGFsYWxhbGFsYSIsInBob25lIjoiKzc5MjAwNDE4MDgyIiwicGhvbmVUb2tlbiI6ImFka2FzZHNhZHNhZCIsImFkZHJlc3MiOiJzdWthICIsInJlZ2lvbiI6bnVsbCwiaWF0IjoxNzAwODMxODk4LCJleHAiOjE3MDA5MTgyOTh9.M49XGAG48aoduEfFN7wf-guKB3l_jLbo8BSqEvjpiaU')
+            await this.authService.isLoggedIn(token);
             return {
                 message:'isLoggined'
             }
@@ -39,6 +39,7 @@ export class AuthController {
 
     @Post('/auth')
     async authUser(@Body()user:UserDto,@Res() res : Response){
+        console.log(user)
         try{
             const token =  await this.authService.authUser(user);
             res.cookie('accessToken', token,{maxAge:1000*60*60*24});
@@ -65,9 +66,9 @@ export class AuthController {
     async resetPassword(@Body()body){
         try{
             const email = await this.authService.resetPassword(body.email);
-            return{
-                message:`Пароль отправлен на почту по адресу: ${email}` 
-            };
+            return {
+                status:'Success'
+            }
         }
         catch(err){
             return err;

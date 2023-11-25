@@ -8,7 +8,7 @@ export class UserModel extends Model {
     id:number;
 
     @Column({type: DataType.STRING,unique: false,allowNull: false})
-    fio:string;
+    name:string;
     @Column({type: DataType.STRING,unique: true,allowNull: false})
     email:string;
 
@@ -23,6 +23,10 @@ export class UserModel extends Model {
 
     @Column({type: DataType.STRING,unique: false,allowNull: true})
     region:string;  
+
+    
+    @Column({type: DataType.STRING,unique: false,allowNull: true})
+    role:string; 
 
     @Column({type: DataType.STRING,unique: false,allowNull: true})
     avatar:string

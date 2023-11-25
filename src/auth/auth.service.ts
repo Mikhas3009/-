@@ -80,6 +80,7 @@ export class AuthService {
     }
     
     async registration(body){
+        body.role = 'user';
         const user = await this.userRepository.createUser(body)
             .catch(err=>{
                 throw new HttpException("Критическая ошибка сервера",HttpStatus.BAD_GATEWAY)
@@ -91,7 +92,7 @@ export class AuthService {
        const res =  await this.jwtService.veifyToken(token)
         .catch((err)=>{
             console.log(err);
-            throw err;
+            throw new UnauthorizedException('Пользователь не авторизован');
         })
         return this.jwtService.generateAccessToken(res);
     }

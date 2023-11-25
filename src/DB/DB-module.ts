@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from "@nestjs/sequelize";
 import * as path from 'path';
+import { MarkModel } from 'src/repository/mark-repository/mark-model';
 import { UserModel } from 'src/repository/user-repository/user-model';
 
 
@@ -22,7 +23,8 @@ import { UserModel } from 'src/repository/user-repository/user-model';
             synchronize: true,
             autoLoadModels: true,
             models:[
-                UserModel
+                UserModel,
+                MarkModel
             ],
         }),
     ],
