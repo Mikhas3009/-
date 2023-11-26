@@ -79,4 +79,11 @@ export class CitizensRequestRepositoryService {
         ).catch((err)=>{throw err})
     }
 
+    async getUnConfirmedReq(){
+        return await this.citizensReqRep.findAll({
+            where:{
+                isChecked:false
+            }
+        }).catch((err)=>{throw err})
+    }
 }

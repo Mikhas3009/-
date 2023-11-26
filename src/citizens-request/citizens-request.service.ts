@@ -4,6 +4,7 @@ import { JWTService } from 'src/jwt/jwt.service';
 import { SitizensReqModel } from 'src/repository/citizens-request-repository/citizens-request-model';
 import { CitizensRequestRepositoryService } from 'src/repository/citizens-request-repository/citizens-request-repository.service';
 import { UserRoles } from 'src/roles-guards/roles';
+import * as uuid from 'uuid';
 
 @Injectable()
 export class CitizensRequestService {
@@ -23,9 +24,10 @@ export class CitizensRequestService {
                 console.log(err);
                 throw new HttpException('Не удалось добавить обращение',HttpStatus.BAD_GATEWAY);
             })
-        let path = '';
+        let path = [];
         files.forEach((file)=>{
-            path = path+file.originalname+" "
+            file.originalname= uuid.v4()+'.png';
+            path.push(file.originalname)
         })
         path = path.slice(0,path.length-1)
         request.pictures = path;
@@ -56,12 +58,12 @@ export class CitizensRequestService {
             }); 
         }
         await Promise.all(requests.map(async (req) => {
-            const pictures = req.pictures.split(' ');
-            req.pictures = '';
+            const pictures = [...req.pictures]
+            req.pictures = [];
     
             await Promise.all(pictures.map(async (picture) => {
                 const url = await this.firebaseService.getPhotoUrl(String(req.id), picture,'service');
-                req.pictures = req.pictures + url+" ";
+                req.pictures.push(url);
             }));
         }));
 
@@ -75,6 +77,14 @@ export class CitizensRequestService {
             .catch((err)=>{
                 console.log(err);
                 throw err;
+            });
+    }
+
+    async getUnConfirmedReq(){
+        return await this.sitizensReqRep.getUnConfirmedReq()
+            .catch(err=>{
+                console.log(err);
+                throw new HttpException('Не удалось получить список запросов',HttpStatus.BAD_GATEWAY)
             });
     }
 }

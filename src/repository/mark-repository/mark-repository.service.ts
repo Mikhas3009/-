@@ -108,7 +108,13 @@ export class MarkRepositoryService {
     }
 
     async getAllMarks(){
-        return await this.markRepository.findAll()
+        return await this.markRepository.findAll(
+            {where:
+                {
+                    isChecked:true
+                }
+            }
+        )
         .catch(err=>{
             throw err;
         })

@@ -1,4 +1,5 @@
 
+import { DataTypes } from "sequelize";
 import { Model ,Table,Column,DataType, ForeignKey, HasMany} from "sequelize-typescript";
 
 
@@ -15,8 +16,11 @@ export class MarkModel extends Model<MarkModel> {
     @Column({type: DataType.STRING,unique: false,allowNull: false})
     description:string;
 
+    @Column({type: DataType.ARRAY(DataTypes.STRING),unique: false,allowNull: true})
+    pictures:string[];
+
     @Column({type: DataType.STRING,unique: false,allowNull: true})
-    pictures:string;
+    address:string;
 
     @Column({type: DataType.FLOAT,unique: false,allowNull: true})
     latitude:number;

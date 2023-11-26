@@ -44,6 +44,7 @@ export class FirebaseService {
     }
 
     async getPhotoUrl(id='', fileName='',folderName = ''): Promise<string> {
+        console.log(fileName)
         const fileRef =  this.firebaseAdmin.storage().bucket().file(`${folderName}${id}/${fileName}`);
 
 
@@ -55,7 +56,6 @@ export class FirebaseService {
     }
 
     async uploadFilesToUserFolder(markId: string, files: Express.Multer.File[],folderName=''): Promise<string[]> {
-
         const bucket = admin.storage().bucket(); // создаем путь к папке пользователя
         files.map(async (file) => {
           // Загрузка файла в папку пользователя

@@ -1,6 +1,7 @@
 
 import { Model ,Table,Column,DataType, ForeignKey, HasMany, HasOne, BelongsTo} from "sequelize-typescript";
 import { UserModel } from "../user-repository/user-model";
+import { DataTypes } from "sequelize";
 
 
 
@@ -16,8 +17,8 @@ export class SitizensReqModel extends Model<SitizensReqModel> {
     @Column({type: DataType.STRING,unique: false,allowNull: false})
     description:string;
 
-    @Column({type: DataType.STRING,unique: false,allowNull: true})
-    pictures:string;
+    @Column({type: DataType.ARRAY(DataTypes.STRING),unique: false,allowNull: true})
+    pictures:string[];
 
     @Column({type: DataType.FLOAT,unique: false,allowNull: true})
     latitude:number;

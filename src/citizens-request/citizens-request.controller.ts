@@ -39,7 +39,7 @@ export class CitizensRequestController {
     @UseGuards(RolesGuard)
     @Roles(UserRoles.Admin)
     @Put('/confirmedRequest')
-    async getUnConfirmedMarks(@Body()req){
+    async confirmRequest(@Body()req){
         try{
             return await this.citizensReqService.confirmRequest(req);
         }
@@ -47,4 +47,17 @@ export class CitizensRequestController {
             return err;
         }
     }
+
+    @UseGuards(RolesGuard)
+    @Roles(UserRoles.Admin)
+    @Get('/getUnConfirmedRequest')
+    async getUnConfirmedRequest(){
+        try{
+            await this.citizensReqService.getUnConfirmedReq();
+        }
+        catch(err){
+            return err;
+        }
+    }
+
 }

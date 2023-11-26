@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { FirebaseService } from 'src/firebase/firebase.service';
 import { MarkModel } from 'src/repository/mark-repository/mark-model';
 import { MarkRepositoryService } from 'src/repository/mark-repository/mark-repository.service';
+import * as uuid from 'uuid';
 
 @Injectable()
 export class MapService {
@@ -13,19 +14,19 @@ export class MapService {
 
     async addMark(body:MarkModel,files:any[]){
         body.isChecked = false;
-        let path = '';
+        let path = [];
         const mark = await this.markReqpositoryService.createMark(body)
             .catch(err=>{
                 console.log(err);
                 throw new HttpException('Не удалось поставить отметку',HttpStatus.BAD_GATEWAY);
             })
         files.forEach((file)=>{
-            path = path+file.originalname+" "
+            file.originalname = uuid.v4()+'.png';
+            path.push(file.originalname);
         })
-        path = path.slice(0,path.length-1)
         mark.pictures = path;
         const [res1 ,res2 ] = await Promise.all([
-            this.firebaseService.uploadFilesToUserFolder(String(mark.id),files),
+            this.firebaseService.uploadFilesToUserFolder(String(mark.id),files,''),
             this.markReqpositoryService.updateMark(mark)
         ]).catch((err)=>{
             throw err;
@@ -36,11 +37,11 @@ export class MapService {
     }
 
     async updateMark(body:MarkModel,files){
-        let path = '';
+        let path = [];
         files.forEach((file)=>{
-            path = path+file.originalname+" "
+            path.push(file.originalname);
         })
-        path = path.slice(0,path.length-1)
+        path = path.splice(0,path.length-1)
         body.pictures = path;
         const [res1 ,res2 ] = await Promise.all([
             this.firebaseService.uploadFilesToUserFolder(String(body.id),files),
@@ -60,18 +61,29 @@ export class MapService {
                 console.log(err);
                 throw err;
             });
-        const pictures = mark.pictures.split(' ');
-        mark.pictures = '';
+        const pictures = [...mark.pictures];
+        mark.pictures = [];
         await Promise.all(pictures.map(async (picture) => {
             const url = await this.firebaseService.getPhotoUrl(String(mark.id), picture);
-            mark.pictures = mark.pictures + url+" ";
+            mark.pictures.push(picture);
         }));
         return mark;
         
     }
 
     async getUnConfirmedMarks(){
-        return await this.markReqpositoryService.getNotAcceptedMarks();
+        const marks =  await this.markReqpositoryService.getNotAcceptedMarks();
+        await Promise.all(marks.map(async (mark) => {
+            const pictures = [...mark.pictures];
+            console.log(pictures)
+            mark.pictures = [];
+            console.log(pictures);
+            await Promise.all(pictures.map(async (picture) => {
+                const url = await this.firebaseService.getPhotoUrl(String(mark.id), picture.replace(' ',''));
+                mark.pictures.push(url);
+            }));
+        }));
+        return marks;
     }
 
     async confirmMark(mark){
@@ -86,12 +98,12 @@ export class MapService {
     async getAllMarks(){
         const marks = await this.markReqpositoryService.getAllMarks();
         await Promise.all(marks.map(async (mark) => {
-            const pictures = mark.pictures.split(' ');
-            mark.pictures = '';
+            const pictures = [...mark.pictures]
+            mark.pictures = [];
     
             await Promise.all(pictures.map(async (picture) => {
                 const url = await this.firebaseService.getPhotoUrl(String(mark.id), picture);
-                mark.pictures = mark.pictures + url+" ";
+                mark.pictures.push(url);
             }));
         }));
         return marks;
@@ -105,12 +117,13 @@ export class MapService {
                 throw new HttpException('Не удалось получить список корриднат',HttpStatus.BAD_GATEWAY);
             });
             await Promise.all(marks.map(async (mark) => {
-                const pictures = mark.pictures.split(' ');
-                mark.pictures = '';
+                const pictures = [...mark.pictures];
+                console.log(pictures);
+                mark.pictures = [];
         
                 await Promise.all(pictures.map(async (picture) => {
                     const url = await this.firebaseService.getPhotoUrl(String(mark.id), picture);
-                    mark.pictures = mark.pictures + url+" ";
+                    mark.pictures.push(url);
                 }));
             }));
         return marks

@@ -20,10 +20,10 @@ export class AuthController {
     async isLoggedIn(@Cookie('accessToken') token) {
         try {
             await this.authService.isLoggedIn(token);
-            return true;
+            return new GlobalResponse(200,true,"IsLoggedIn").response;
         }
         catch (err) {
-            return false
+            return new GlobalResponse(400,false,"isNotLoggedIn").response;
         }
     }
 
@@ -34,7 +34,7 @@ export class AuthController {
             return (new GlobalResponse(success ? 200 : 401,success,success ? "Успешно" : "Данная почта уже используется").response)
         }
         catch (err) {
-            return (new GlobalResponse(401,false,err.message));
+            return (new GlobalResponse(401,false,err.message)).response;
         }
     }
     @Post('/verifyNumber')
@@ -121,7 +121,7 @@ export class AuthController {
             return (new GlobalResponse(success ? 200 : 401,success,success ? "Успешно" : "Данный номер уже используется").response)
         }
         catch (err) {
-            return (new GlobalResponse(401,false,err.message));
+            return (new GlobalResponse(401,false,err.message)).response;
         }
     }
 }

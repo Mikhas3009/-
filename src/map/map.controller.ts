@@ -4,6 +4,7 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { RolesGuard } from 'src/roles-guards/admin-guard';
 import { UserRoles } from 'src/roles-guards/roles';
 import { Roles } from 'src/roles-guards/role-decorator';
+import { GlobalResponse } from 'src/globals/global-response-type';
 
 @Controller('map')
 export class MapController {
@@ -16,10 +17,11 @@ export class MapController {
     @Post('/addMark')
     async addMark(@Body()mark,@UploadedFiles()files){
         try{
-            return await this.mapService.addMark(mark,files)
+            await this.mapService.addMark(mark,files)
+            return new GlobalResponse(200,true,"Отметка успешно добавлена").response
         }
         catch(err){
-            return err;
+            return new GlobalResponse(400,false,err.message).response
         }
     }   
 
@@ -29,10 +31,11 @@ export class MapController {
     @Post('/updateMark')
     async updateMark(@Body()mark,@UploadedFiles()files){
         try{
-            return await this.mapService.updateMark(mark,files)
+            await this.mapService.updateMark(mark,files)
+            return new GlobalResponse(200,true,"Отметка успешно изменена").response
         }
         catch(err){
-            return err;
+            return new GlobalResponse(400,false,err.message).response
         }
     }   
 
@@ -40,30 +43,33 @@ export class MapController {
     @Get('/getClosestMarks')
     async getClosestMark(@Body()coordinates){
         try{
-            return await this.mapService.getClosestMarks(coordinates);
+            const marks =  await this.mapService.getClosestMarks(coordinates);
+            return new GlobalResponse(200,true,"Отметки успешно получены",'',marks).response
         }
         catch(err){
-            return err;
+            return new GlobalResponse(400,false,err.message).response
         }
     }
 
     @Get('/getMarks')
     async getMarks(){
         try{
-            return await this.mapService.getAllMarks();
+            const marks = await this.mapService.getAllMarks();
+            return new GlobalResponse(200,true,"Отметки успешно получены",'',marks).response
         }
         catch(err){
-            return err;
+            return new GlobalResponse(400,false,err.message).response
         }
     }
 
     @Get('/mark/:id')
     async getMarkById(@Param('id',ParseIntPipe)id){
         try{
-            return await this.mapService.getMarkById(id)
+            const mark = await this.mapService.getMarkById(id)
+            return new GlobalResponse(200,true,"Отметка успешно получена",'',mark).response
         }
         catch(err){
-            return err;
+            return new GlobalResponse(400,false,err.message).response
         }
     }
 
@@ -72,10 +78,11 @@ export class MapController {
     @Get('/unConfirmedMarks')
     async getUnConfirmedMarks(){
         try{
-            return await this.mapService.getUnConfirmedMarks();
+            const marks =  await this.mapService.getUnConfirmedMarks();
+            return new GlobalResponse(200,true,"Отметка успешно получена",'',marks).response
         }
         catch(err){
-            return err;
+            return new GlobalResponse(400,false,err.message).response
         }
     }
 
@@ -84,10 +91,11 @@ export class MapController {
     @Delete('/deleteMark')
     async deleteMark(@Body()mark){
         try{
-            return await this.mapService.deleteMark(mark);
+            await this.mapService.deleteMark(mark);
+            return (new GlobalResponse(200,true,"Отметка успешно удалена").response)
         }
         catch(err){
-            return err;
+            return new GlobalResponse(400,false,err.message).response
         }
     }
 
@@ -97,9 +105,10 @@ export class MapController {
     async confirmMark(@Body()mark){
         try{
             await this.mapService.confirmMark(mark)
+            return (new GlobalResponse(200,true,"Отметка успешно подтверждена").response)
         }
         catch(err){
-            return err;
+            return (new GlobalResponse(400,false,err.message))
         }
     }
 
@@ -110,9 +119,10 @@ export class MapController {
         console.log(marks)
         try{
             await this.mapService.addMarks(marks)
+            return (new GlobalResponse(200,true,"Отметка успешно добавлена").response)
         }
         catch(err){
-            return err;
+            return (new GlobalResponse(400,false,err.message))
         }
     }  
 }
